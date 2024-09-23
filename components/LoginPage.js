@@ -88,7 +88,7 @@ const LoginPage = () => {
     }
 
     const handleLogin = () => {
-        navigation.navigate('AdminEntry'); // Navega a la pantalla AdminEntry
+        navigation.navigate('ManagerEntry'); // Navega a la pantalla AdminEntry
     };
 
     return (
