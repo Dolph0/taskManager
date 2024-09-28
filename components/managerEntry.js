@@ -26,7 +26,7 @@ const ManagerEntry = () => {
       {/* Botón Editar empleados */}
       <TouchableOpacity 
         style={[styles.button, { width: screenWidth - 70 }]} // El ancho del botón ocupa todo menos los márgenes
-        onPress={() => navigation.navigate('EditEmployees')} // Prepara la navegación para la pantalla 'EditEmployees'
+        onPress={() => navigation.navigate('EditEmployee')} // Prepara la navegación para la pantalla 'EditEmployees'
       >
         <Text style={styles.buttonText}>Editar empleados</Text>
       </TouchableOpacity>
