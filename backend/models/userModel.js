@@ -1,22 +1,27 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import { Schema, model } from 'mongoose';
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['user', 'manager', 'administrator'], required: true },
+    role: { type: String, enum: ['user', 'manager', 'admin'], default: 'user' },
+    tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }]
 });
 
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 12);
-    next();
+const User = model('User', userSchema);
+
+
+const managerSchema = new Schema({
+    managedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
-userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
-    return await bcrypt.compare(candidatePassword, userPassword);
-};
+const adminSchema = new Schema({
+    managedManagers: [{ type: Schema.Types.ObjectId, ref: 'Manager' }]
+});
 
-const User = mongoose.model('User', userSchema);
+const Manager = User.discriminator('Manager', managerSchema);
+const Admin = User.discriminator('Admin', adminSchema);
 
-module.exports = User;
+
+export default User;
+export { Manager, Admin };
+

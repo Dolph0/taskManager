@@ -1,5 +1,5 @@
-const express = require('express');
-const authController = require('../controllers/authController');
+import express from 'express';
+import { signup, login } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ const router = express.Router();
  *       400:
  *         description: Bad request
  */
-router.post('/signup', authController.signup);
+router.post('/signup', signup);
 
 /**
  * @swagger
@@ -65,6 +65,6 @@ router.post('/signup', authController.signup);
  *       401:
  *         description: Incorrect username or password
  */
-router.post('/login', authController.login);
+router.post('/login', login);
 
-module.exports = router;
+export default router;

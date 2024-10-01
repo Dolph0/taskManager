@@ -1,9 +1,9 @@
-const express = require('express');
-const taskController = require('../controllers/taskController');
-const authMiddleware = require('../middleware/authMiddleware');
-const roleMiddleware = require('../middleware/roleMiddleware');
-
-const router = express.Router();
+import { Router } from 'express';
+import { createTask, editTask, deleteTask, markTaskAsDone, uploadTaskPicture } from '../controllers/taskController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import roleMiddleware from '../middleware/roleMiddleware.js';
+import upload from '../middleware/uploadMiddleware.js';
+const router = Router();
 
 router.use(authMiddleware);
 
@@ -11,103 +11,12 @@ router.use(authMiddleware);
  * @swagger
  * tags:
  *   name: Tasks
- *   description: API for task management
+ *   description: API for managing tasks
  */
 
 /**
  * @swagger
- * /tasks:
- *   get:
- *     summary: Get tasks for the authenticated user
- *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: List of tasks assigned to the user
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     example: 60c72b2f5f3e2c001c8e4a3f
- *                   title:
- *                     type: string
- *                     example: Complete the project report
- *                   status:
- *                     type: string
- *                     example: pending
- *                   assignedTo:
- *                     type: string
- *                     example: 60c72b2f5f3e2c001c8e4a3d
- *       403:
- *         description: User is not authorized to access these tasks
- */
-router.get('/', roleMiddleware(['user', 'manager', 'administrator']), taskController.getTasksForUser);
-
-/**
- * @swagger
- * /tasks/{taskId}/done:
- *   patch:
- *     summary: Mark a task as done
- *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: taskId
- *         schema:
- *           type: string
- *         required: true
- *         description: The ID of the task to mark as done
- *     responses:
- *       200:
- *         description: Task marked as done
- *       403:
- *         description: User is not authorized to mark this task as done
- */
-router.patch('/:taskId/done', roleMiddleware(['user']), taskController.markTaskAsDone);
-
-/**
- * @swagger
- * /tasks/{taskId}/image:
- *   post:
- *     summary: Upload an image for a task
- *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: taskId
- *         schema:
- *           type: string
- *         required: true
- *         description: The ID of the task to upload an image for
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               image:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Image uploaded successfully
- *       403:
- *         description: User is not authorized to upload an image for this task
- */
-router.post('/:taskId/image', roleMiddleware(['user']), taskController.uploadTaskImage);
-
-/**
- * @swagger
- * /tasks:
+ * /tasks/create:
  *   post:
  *     summary: Create a new task
  *     tags: [Tasks]
@@ -120,30 +29,76 @@ router.post('/:taskId/image', roleMiddleware(['user']), taskController.uploadTas
  *           schema:
  *             type: object
  *             properties:
- *               title:
+ *               name:
  *                 type: string
- *                 example: Design a new logo
+ *                 example: New Task
  *               description:
  *                 type: string
- *                 example: The logo should reflect our brand's values
+ *                 example: This is a description of the task.
  *               dueDate:
  *                 type: string
  *                 format: date-time
- *                 example: 2024-09-01T10:00:00Z
+ *                 example: 2024-09-01T12:00:00Z
  *               assignedTo:
  *                 type: string
- *                 example: 60c72b2f5f3e2c001c8e4a3d
+ *                 example: 60c72b2f9b1d8c6f9f8b4567
  *     responses:
  *       201:
  *         description: Task created successfully
- *       403:
- *         description: User is not authorized to create a task
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
  */
-router.post('/', roleMiddleware(['manager', 'administrator']), taskController.createTask);
+router.post('/create', authMiddleware, roleMiddleware(['manager', 'admin']), createTask);
 
 /**
  * @swagger
- * /tasks/{taskId}:
+ * /tasks/edit/{id}:
+ *   put:
+ *     summary: Edit an existing task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The task ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Updated Task Name
+ *               description:
+ *                 type: string
+ *                 example: Updated task description.
+ *               dueDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example: 2024-09-01T12:00:00Z
+ *     responses:
+ *       200:
+ *         description: Task updated successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
+ */
+router.put('/edit/:id', authMiddleware, roleMiddleware(['manager', 'admin']), editTask);
+
+/**
+ * @swagger
+ * /tasks/delete/{id}:
  *   delete:
  *     summary: Delete a task
  *     tags: [Tasks]
@@ -151,17 +106,82 @@ router.post('/', roleMiddleware(['manager', 'administrator']), taskController.cr
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: taskId
+ *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: The ID of the task to delete
+ *         description: The task ID
  *     responses:
- *       204:
+ *       200:
  *         description: Task deleted successfully
- *       403:
- *         description: User is not authorized to delete this task
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
  */
-router.delete('/:taskId', roleMiddleware(['manager', 'administrator']), taskController.deleteTask);
+router.delete('/delete/:id', authMiddleware, roleMiddleware(['manager', 'admin']), deleteTask);
 
-module.exports = router;
+/**
+ * @swagger
+ * /tasks/mark-done/{id}:
+ *   put:
+ *     summary: Mark a task as done
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The task ID
+ *     responses:
+ *       200:
+ *         description: Task marked as done
+ *       404:
+ *         description: Task not found
+ */
+router.put('/mark-done/:id', authMiddleware, roleMiddleware(['user']), markTaskAsDone);
+
+/**
+ * @swagger
+ * /tasks/upload-picture/{id}:
+ *   post:
+ *     summary: Upload a picture for a task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The task ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Picture uploaded successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
+ */
+router.post('/upload-picture/:id', authMiddleware, roleMiddleware(['user']), upload.single('image'), uploadTaskPicture);
+
+
+export default router;

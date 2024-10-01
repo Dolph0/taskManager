@@ -1,16 +1,15 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const taskSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    description: String,
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    imageRequired: { type: Boolean, default: false },
-    imagePath: String,
-    dueDate: Date,
-    status: { type: String, enum: ['pending', 'done'], default: 'pending' },
-    priority: { type: Boolean, default: false },
+const taskSchema = new Schema({
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
+    requiresPicture: { type: Boolean, default: false },
+    picture: String,
+    dueDate: { type: Date, required: true },
+    status: { type: String, enum: ['pending', 'done'], default: 'pending' }
 });
 
-const Task = mongoose.model('Task', taskSchema);
+const Task = model('Task', taskSchema);
 
-module.exports = Task;
+export default Task;

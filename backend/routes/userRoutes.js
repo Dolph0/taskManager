@@ -1,8 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
-const authMiddleware = require('../middleware/authMiddleware');
-const roleMiddleware = require('../middleware/roleMiddleware');
+import { Router } from 'express';
+const router = Router();
+import { createUser, editUser, deleteUser } from '../controllers/userController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import roleMiddleware from '../middleware/roleMiddleware.js';
 
 /**
  * @swagger
@@ -43,7 +43,7 @@ const roleMiddleware = require('../middleware/roleMiddleware');
  *       401:
  *         description: Unauthorized
  */
-router.post('/create', authMiddleware, roleMiddleware(['manager', 'admin']), userController.createUser);
+router.post('/create', authMiddleware, roleMiddleware(['manager', 'admin']), createUser);
 
 /**
  * @swagger
@@ -83,7 +83,7 @@ router.post('/create', authMiddleware, roleMiddleware(['manager', 'admin']), use
  *       404:
  *         description: User not found
  */
-router.put('/edit/:id', authMiddleware, roleMiddleware(['manager', 'admin']), userController.editUser);
+router.put('/edit/:id', authMiddleware, roleMiddleware(['manager', 'admin']), editUser);
 
 /**
  * @swagger
@@ -110,6 +110,10 @@ router.put('/edit/:id', authMiddleware, roleMiddleware(['manager', 'admin']), us
  *       404:
  *         description: User not found
  */
-router.delete('/delete/:id', authMiddleware, roleMiddleware(['manager', 'admin']), userController.deleteUser);
+router.delete('/delete/:id', authMiddleware, roleMiddleware(['manager', 'admin']), deleteUser);
 
-module.exports = router;
+export default router;
+
+
+
+

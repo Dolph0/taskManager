@@ -1,26 +1,52 @@
-const User = require('../models/userModel');
-const jwt = require('jsonwebtoken');
-const config = require('../config/config');
+//import User from '../models/userModel';
+//import jwt from 'jsonwebtoken';
+import authService from '../services/authService.js';
 
-const signToken = id => {
-    return jwt.sign({ id }, config.JWT_SECRET, { expiresIn: '7d' });
-};
+export const signup = async (req, res) => {
+    console.log('Received signup request:', req.body);
+    try {
+        const { username, password, role } = req.body;
 
-exports.signup = async (req, res) => {
-    const { username, password, role } = req.body;
-    const newUser = await User.create({ username, password, role });
-    const token = signToken(newUser._id);
-    res.status(201).json({ token, user: newUser });
-};
+        console.log(`Attempting to sign up user: ${username} with role: ${role}`);
 
-exports.login = async (req, res) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
+        const result = await authService.signup(username, password, role);
 
-    if (!user || !(await user.correctPassword(password, user.password))) {
-        return res.status(401).json({ message: 'Incorrect username or password!' });
+        console.log('User created:', result);
+
+        res.status(201).json(result);
+    } catch (error) {
+        console.error('Signup error:', error.message);
     }
+};
 
-    const token = signToken(user._id);
-    res.status(200).json({ token, user });
+export const login = async (req, res) => {
+    console.log('Received login request:', req.body);
+    try {
+        const { username, password } = req.body;
+
+        console.log(`Attempting to log in user: ${username}`);
+
+        // // Find user by username
+        // const user = await User.findOne({ username });
+        // if (!user) {
+        //     return res.status(401).json({ message: 'Incorrect username or password!' });
+        // }
+
+        // // Compare the hashed password
+        // const isPasswordValid = await bcrypt.compare(password, user.password);
+        // if (!isPasswordValid) {
+        //     return res.status(401).json({ message: 'Incorrect username or password!' });
+        // }
+
+        const result = await authService.login(username, password); // Ensure authService.login is correctly defined
+        console.log('User logged in:', result);
+        res.status(200).json(result);
+
+        // // Successful login
+        // console.log('User logged in:', user);
+        // res.status(200).json(user); // Send user info or token, depending on your implementation
+    } catch (error) {
+        console.error('Login error:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };

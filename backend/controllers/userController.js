@@ -1,6 +1,6 @@
-const User = require('../models/userModel');
+import User from '../models/userModel.js';
 
-exports.createUser = async (req, res) => {
+export const createUser = async (req, res) => {
     try {
         const { username, password, role } = req.body;
         const newUser = await User.create({ username, password, role });
@@ -10,7 +10,7 @@ exports.createUser = async (req, res) => {
     }
 };
 
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.userId);
         if (!user) {
@@ -22,7 +22,7 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
-exports.editUser = async (req, res) => {
+export const editUser = async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
         if (!user) {
@@ -34,7 +34,7 @@ exports.editUser = async (req, res) => {
     }
 };
 
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req, res) => {
     try {
         const users = await User.find();
         res.status(200).json(users);
