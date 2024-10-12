@@ -38,13 +38,13 @@ export const login = async (req, res) => {
         //     return res.status(401).json({ message: 'Incorrect username or password!' });
         // }
 
-        const result = await authService.login(username, password); // Ensure authService.login is correctly defined
+        const result = await authService.login(username, password);
         console.log('User logged in:', result);
         res.status(200).json(result);
 
         // // Successful login
         // console.log('User logged in:', user);
-        // res.status(200).json(user); // Send user info or token, depending on your implementation
+        // res.status(200).json(user); 
     } catch (error) {
         console.error('Login error:', error.message);
         res.status(500).json({ message: 'Internal server error' });

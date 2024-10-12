@@ -29,12 +29,12 @@ import roleMiddleware from '../middleware/roleMiddleware.js';
  *               name:
  *                 type: string
  *                 example: John Doe
- *               email:
- *                 type: string
- *                 example: johndoe@example.com
  *               password:
  *                 type: string
  *                 example: password123
+ *               role:
+ *                 type: string
+ *                 example: user
  *     responses:
  *       201:
  *         description: User created successfully
@@ -70,9 +70,6 @@ router.post('/create', authMiddleware, roleMiddleware(['manager', 'admin']), cre
  *               name:
  *                 type: string
  *                 example: John Doe
- *               email:
- *                 type: string
- *                 example: johndoe@example.com
  *     responses:
  *       200:
  *         description: User updated successfully
@@ -110,7 +107,7 @@ router.put('/edit/:id', authMiddleware, roleMiddleware(['manager', 'admin']), ed
  *       404:
  *         description: User not found
  */
-router.delete('/delete/:id', authMiddleware, roleMiddleware(['manager', 'admin']), deleteUser);
+router.delete('/delete/:userId', authMiddleware, roleMiddleware(['manager', 'admin']), deleteUser);
 
 export default router;
 

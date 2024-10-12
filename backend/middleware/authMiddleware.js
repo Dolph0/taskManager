@@ -1,6 +1,4 @@
-import pkg from 'jsonwebtoken';
-const { verify } = pkg;
-
+import validateToken from '../utils/tokenUtils.js';
 import User from '../models/userModel.js';
 
 const authMiddleware = async (req, res, next) => {
@@ -11,8 +9,8 @@ const authMiddleware = async (req, res, next) => {
     }
 
     try {
-        const decoded = verify(token, process.env.JWT_SECRET);
-        const user = await User.findByPk(decoded.id);
+        const decoded = validateToken(token);
+        const user = await User.findById(decoded.id);
 
         if (!user) {
             return res.status(401).json({ message: 'Authorization denied, user not found' });
@@ -21,7 +19,7 @@ const authMiddleware = async (req, res, next) => {
         req.user = user;
         next();
     } catch (err) {
-        res.status(401).json({ message: 'Token is not valid' });
+        res.status(401).json({ message: err.message });
     }
 };
 
