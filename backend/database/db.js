@@ -27,10 +27,7 @@ const createAdminUser = async () => {
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(DATABASE_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(DATABASE_URL);
         console.log('Database connected successfully');
         await createAdminUser();
     } catch (error) {

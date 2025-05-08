@@ -5,6 +5,7 @@ import LoginPage from './components/LoginPage';
 import AdminEntry from './components/adminEntry'; // Asegúrate de que la ruta sea correcta
 import ManagerEntry from './components/managerEntry'; // Importa el nuevo componente ManagerEntry
 import EditEmployee from './components/EditEmployee'; // Importa la nueva pantalla
+import EmployeeEntry from './components/employeeEntry'; // Importa el componente EmployeeEntry
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +33,11 @@ export default function App() {
             name="EditEmployee" 
             component={EditEmployee} 
             options={{ headerShown: false }}  // Oculta la cabecera si no la necesitas
+          />
+          <Stack.Screen 
+            name="EmployeeEntry" 
+            component={EmployeeEntry} 
+            options={{ headerShown: false }}  // Oculta la cabecera
           />
         </Stack.Navigator>
       </SafeAreaView>
